@@ -9,9 +9,9 @@ import { Request } from 'express';
 import { LOG_MESSAGE, LOG_KEY } from '../constants/logs';
 import { Logger } from '../utils';
 
-function getPrintLogFormat(message: string) {
+function getPrintLogFormat(message: string, name = '') {
   return `
-<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+${name}<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 ${message}
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n`;
 }
@@ -36,6 +36,17 @@ function getInfoData(context: ExecutionContext) {
   };
 }
 
+function getLogData(context: ExecutionContext) {
+  return {
+    ...getInfoData(context),
+    request: getBaseData(context),
+  };
+}
+
+function getLogDataFormat(data: any, name?: string) {
+  return getPrintLogFormat(JSON.stringify(data, null, 2), name);
+}
+
 @Injectable()
 export class LogsInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
@@ -50,21 +61,28 @@ export class LogsInterceptor implements NestInterceptor {
     if (isPrintLog) {
       let response: any;
       const startTime = Date.now();
+      function getTime() {
+        return `${Date.now() - startTime}ms`;
+      }
       observable.subscribe({
         next: (value) => {
           response = value;
         },
+        error: (error: Error) => {
+          const logMessageData = {
+            ...getLogData(context),
+            time: getTime(),
+            responseError: error.message,
+          };
+          Logger.access(fileName, getLogDataFormat(logMessageData, 'error'));
+        },
         complete: () => {
           const logMessageData = {
-            ...getInfoData(context),
-            time: `${Date.now() - startTime}ms`,
-            request: getBaseData(context),
+            ...getLogData(context),
+            time: getTime(),
             response,
           };
-          const logStr = getPrintLogFormat(
-            JSON.stringify(logMessageData, null, 2),
-          );
-          Logger.access(fileName, logStr);
+          Logger.access(fileName, getLogDataFormat(logMessageData));
         },
       });
     }
