@@ -1,8 +1,8 @@
 {
-  "name": "nest-logs",
-  "version": "0.0.2",
+  "name": "@abmao/nest-logs",
+  "version": "0.0.1",
   "description": "在nestjs中实现日志打印功能",
-  "author": "kuangshp@126.com",
+  "author": "mawencan",
   "license": "MIT",
   "files": [
     "dist/**/*"
@@ -16,7 +16,7 @@
     "log4js",
     "日志"
   ],
-  "homepage": "https://github.com/kuangshp/nest-logs",
+  "homepage": "https://github.com/hengshanMWC/nest-logs",
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",

@@ -7,13 +7,13 @@
 * 1、在你的`nestjs`项目中安装依赖包
 
   ```properties
-  npm install nest-logs
+  npm install @abmao/nest-logs
   ```
 
 * 2、在`app.module.ts`中导入日志模块包
 
   ```typescript
-  import { NestLogsModule} from 'nest-logs';
+  import { NestLogsModule} from '@abmao/nest-logs';
   
   @Module({
     imports: [
@@ -29,10 +29,10 @@
 
 ## 二、基本使用
 
-* 1、如果你想拦截每次请求，你可以在控制器上加上`nest-logs`包中提供的装饰器
+* 1、如果你想拦截每次请求，你可以在控制器上加上`@abmao/nest-logs`包中提供的装饰器
 
   ```typescript
-  import { NestLogger } from 'nest-logs';
+  import { NestLogger } from '@abmao/nest-logs';
   @NestLogger()
   @Controller()
   export class AppController {}
@@ -60,7 +60,7 @@
   > 默认会存储到日志文件中,如果你不想存储仅仅是想在控制台上显示日志,可以加上第二个参数为`false`
 
   ```typescript
-  import { Logger } from 'nest-logs';
+  import { Logger } from '@abmao/nest-logs';
   
   ...
   @Get()
@@ -101,7 +101,7 @@
       instances: '2', // max表示最大的 应用启动实例个数，仅在 cluster 模式有效 默认为 fork
       autorestart: true, // 默认为 true, 发生异常的情况下自动重启
       max_memory_restart: '1G',
-      instance_var: "INSTANCE_ID", // 添加这一行可以实现使用nest-logs包的日志管理
+      instance_var: "INSTANCE_ID", // 添加这一行可以实现使用@abmao/nest-logs包的日志管理
       // error_file: './logs/app-err.log', // 错误日志文件
       // out_file: './logs/app-out.log', // 正常日志文件
       // merge_logs: true, // 设置追加日志而不是新建日志
