@@ -73,15 +73,14 @@ export class LogsInterceptor implements NestInterceptor {
           Logger.access(fileName, getLogDataFormat(logMessageData));
         }
       }),
-      catchError((error, caught) => {
+      catchError((error) => {
         if (isPrintLog) {
-          console.log(error, caught);
           const logMessageData = {
             ...getLogData(context),
             time: getTime(),
             responseError: error?.message ?? error,
           };
-          Logger.access(fileName, getLogDataFormat(logMessageData, 'error'));
+          Logger.accessError(fileName, getLogDataFormat(logMessageData));
         }
         return throwError(error);
       }),
