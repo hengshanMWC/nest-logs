@@ -4,8 +4,8 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { share } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { tap, catchError } from 'rxjs/operators';
 import { Request } from 'express';
 import { LOG_MESSAGE, LOG_KEY } from '../constants/logs';
 import { Logger } from '../utils';
@@ -57,37 +57,34 @@ export class LogsInterceptor implements NestInterceptor {
       Reflect.getMetadata(LOG_MESSAGE, context.getHandler()) ||
       Reflect.getMetadata(LOG_MESSAGE, context.getClass());
 
-    const observable = next.handle().pipe(share());
-    if (isPrintLog) {
-      let response: any;
-      const startTime = Date.now();
-      function getTime() {
-        return `${Date.now() - startTime}ms`;
-      }
+    const startTime = Date.now();
+    function getTime() {
+      return `${Date.now() - startTime}ms`;
+    }
 
-      observable.subscribe({
-        next: (value) => {
-          response = value;
-        },
-        error: (error: Error) => {
-          const logMessageData = {
-            ...getLogData(context),
-            time: getTime(),
-            responseError: error.message,
-          };
-          Logger.access(fileName, getLogDataFormat(logMessageData, 'error'));
-        },
-        complete: () => {
+    return next.handle().pipe(
+      tap((response) => {
+        if (isPrintLog) {
           const logMessageData = {
             ...getLogData(context),
             time: getTime(),
             response,
           };
           Logger.access(fileName, getLogDataFormat(logMessageData));
-        },
-      });
-    }
-
-    return observable;
+        }
+      }),
+      catchError((error, caught) => {
+        if (isPrintLog) {
+          console.log(error, caught);
+          const logMessageData = {
+            ...getLogData(context),
+            time: getTime(),
+            responseError: error?.message ?? error,
+          };
+          Logger.access(fileName, getLogDataFormat(logMessageData, 'error'));
+        }
+        return throwError(error);
+      }),
+    );
   }
 }
