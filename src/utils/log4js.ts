@@ -74,14 +74,6 @@ export class Logger {
     Logger.loggerCustom.info(fileName, args);
   }
 
-  static accessError(
-    fileName: string,
-    args: string | object | number | boolean | unknown,
-  ) {
-    Logger.loggerCustom.error(fileName, args);
-    logger.error(fileName, args);
-  }
-
   private static printLog(
     type: string,
     args: string | object | number | boolean | unknown,
@@ -89,12 +81,9 @@ export class Logger {
   ): void {
     const fileInfo = Logger.getStackTrace();
     if (isPersistent) {
-      Logger.loggerCustom[type](
-        fileInfo,
-        `\n${JSON.stringify(args, null, 2)}\n`,
-      );
+      Logger.loggerCustom[type](fileInfo, args);
     }
-    logger[type](fileInfo, `\n${JSON.stringify(args, null, 2)}\n`);
+    logger[type](fileInfo, args);
   }
 
   private static getStackTrace = (deep = 3): string => {

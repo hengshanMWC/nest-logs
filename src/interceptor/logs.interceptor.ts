@@ -80,7 +80,7 @@ export class LogsInterceptor implements NestInterceptor {
             time: getTime(),
             responseError: error?.message ?? error,
           };
-          Logger.accessError(fileName, getLogDataFormat(logMessageData));
+          Logger.error(getLogDataFormat(logMessageData), false);
         }
         return throwError(error);
       }),
